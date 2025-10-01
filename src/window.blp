@@ -1,0 +1,124 @@
+using Gtk 4.0;
+using Adw 1;
+
+StringList styles_list {
+  strings [_("Paragraph"), _("Heading 1"), _("Heading 2"), _("Heading 3"), _("Heading 4"), _("Heading 5"), _("Heading 6"), _("Code"), _("Quote")]
+}
+
+template $LettersWindow: Adw.ApplicationWindow {
+  title: _("Letters");
+  default-width: 800;
+  default-height: 600;
+  height-request: 360;
+  width-request: 296;
+
+  content: Adw.ToolbarView tbview {
+    top-bar-style: raised;
+    [top]
+    Adw.HeaderBar {
+      [start]
+      Button add_button {
+        icon-name: "list-add";
+        tooltip-text: _("New Document");
+      }
+
+      [end]
+      MenuButton {
+        primary: true;
+        icon-name: "open-menu-symbolic";
+        tooltip-text: _("Main Menu");
+        menu-model: primary_menu;
+      }
+    }
+
+    [top]
+    Adw.TabBar tabbar {
+      view: tabview;
+    }
+
+    [top]
+      Box toolbar{
+        css-classes: ['toolbar'];
+        halign: center;
+
+        ToggleButton bold_button {
+          icon-name: "text-bold-symbolic";
+          tooltip-text: _("Bold");
+        }
+
+        ToggleButton italic_button {
+          icon-name: "text-italic-symbolic";
+          tooltip-text: _("Italic");
+        }
+
+        ToggleButton underline_button {
+          icon-name: "text-underline-symbolic";
+          tooltip-text: _("Underline");
+        }
+
+        ToggleButton list_button {
+          icon-name: "insert-list-symbolic";
+          tooltip-text: _("Insert list");
+        }
+
+        Button link_button {
+          icon-name: "chain-link-symbolic";
+          tooltip-text: _("Insert link...");
+        }
+
+        Button image_button {
+          icon-name: "image-round-symbolic";
+          tooltip-text: _("Insert image...");
+        }
+
+        DropDown styles_dropdown{
+          tooltip-text: _("Paragraph Style");
+          model: styles_list;
+        }
+      }
+
+    content: Stack stack {
+      [child]
+      StackPage {
+        child: Adw.TabView tabview {};
+      }
+
+      [child]
+      StackPage {
+        child: Adw.StatusPage statuspage{
+          icon-name: _("document-new-symbolic");
+          title: _("Create a new document");
+          description: _("Create a new document (Ctrl + N), open an existing one (Ctrl + O)");
+        };
+      }
+    };
+  };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("Open");
+      action: "app.open";
+    }
+    item {
+      label: _("Save");
+      action: "app.save";
+    }
+    item (_("Save As"), "app.save_as", "document-save-as-symbolic")
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Letters");
+      action: "app.about";
+    }
+  }
+}
