@@ -184,8 +184,43 @@ class LettersWindow(Adw.ApplicationWindow):
                 self.tbview.set_top_bar_style(Adw.ToolbarStyle.FLAT)
 
     def close_window(self, window):
-        pass
+        dirty_pages = [
+            self.tabview.get_nth_page(i)
+            for i in range(self.tabview.get_n_pages())
+            if self.tabview.get_nth_page(i).get_needs_attention()
+        ]
 
+        if not dirty_pages:
+            return False
+
+        dialog = Adw.AlertDialog()
+        dialog.set_heading(_("Unsaved changes"))
+        body_lines = [_("The following documents have unsaved changes:")]
+        body_lines += [f"• {p.get_title()}" for p in dirty_pages]
+        body_lines += [_("All unsaved changes will be discarded if you close Letters now.")]
+        dialog.set_body("\n".join(body_lines))
+
+        dialog.add_response("cancel", _("_Cancel"))
+        dialog.add_response("discard", _("_Discard All"))
+        dialog.set_default_response("cancel")
+        dialog.set_close_response("cancel")
+        dialog.set_response_appearance("cancel", Adw.ResponseAppearance.DESTRUCTIVE)
+
+        def dialog_callback(d, result):
+            try:
+                resp = d.choose_finish(result)
+                if resp == "cancel":
+                    return
+
+                if resp == "discard":
+                    self.destroy()
+                    return
+
+            except Exception as e:
+                print(e)
+
+        dialog.choose(self, None, dialog_callback)
+        return True
 
     def update_title(self, tabview = None, data = None):
         page = self.tabview.get_selected_page()
