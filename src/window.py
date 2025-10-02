@@ -19,9 +19,9 @@
 
 import gi
 gi.require_version('WebKit', '6.0')
-from gi.repository import Gio, Adw, Gtk, WebKit
+from gi.repository import Gio, Adw, Gtk, WebKit, GLib
 
-import os
+import os, tempfile
 import pypandoc, weasyprint
 
 @Gtk.Template(resource_path='/net/codelogistics/letters/window.ui')
@@ -46,7 +46,7 @@ class LettersWindow(Adw.ApplicationWindow):
 
     FORCE_CLOSE = False
 
-    def __init__(self, **kwargs):
+    def __init__(self, opening_with_files = False, **kwargs):
         super().__init__(**kwargs)
 
         self.connect("close-request", self.close_window)
@@ -65,7 +65,8 @@ class LettersWindow(Adw.ApplicationWindow):
         self.image_button.connect('clicked', lambda btn: self.get_application().get_active_window().run_js(None, "insertImage()"))
         self.styles_dropdown.connect("notify::selected", lambda dropdown, _: self.get_application().get_active_window().on_style_dropdown_changed(None, dropdown))
 
-        self.new_file()
+        if not opening_with_files:
+            self.new_file()
 
     # ---------------------------------- GTK/ FRONTEND RELATED FUNCTIONS ---------------------------
 
@@ -106,6 +107,7 @@ class LettersWindow(Adw.ApplicationWindow):
         return
 
     def open(self, action, data = None):
+    # show a dialog to open a file
         def open_callback(dialog, result, data = None):
             try:
                 file = open_dialog.open_finish(result)
@@ -118,7 +120,7 @@ class LettersWindow(Adw.ApplicationWindow):
                     dialog.choose(self)
                     return
                 else:
-                    webview = self.new_webview(file.get_path())
+                    webview = self.new_webview(file)
                     webview.fresh = False
                     page = self.tabview.append(webview)
                     page.set_title(file.get_basename())
@@ -133,6 +135,21 @@ class LettersWindow(Adw.ApplicationWindow):
         open_dialog = Gtk.FileDialog()
         open_dialog.open(self, None, open_callback, None)
         self.update_title()
+
+    def open_files(self, files):
+        # When window is opened with files
+        for i in files:
+            webview = self.new_webview(i)
+            webview.file = file
+            webview.fresh = False
+            page = self.tabview.append(webview)
+            page.set_title(i.get_basename())
+            page.set_needs_attention(False)
+            page.closing_after_save = False
+        self.update_title()
+        self.toolbar.set_visible(True)
+        self.stack.set_visible_child(self.tabview)
+        self.tbview.set_top_bar_style(Adw.ToolbarStyle.RAISED)
 
     def new_page(self, tabview, pos, data=None):
         self.update_title()
@@ -249,7 +266,7 @@ class LettersWindow(Adw.ApplicationWindow):
 
     # --------------------------------- WEBKIT RELATED FUNCTIONS ----------------------------------------------------
 
-    def new_webview(self, file_path = None):
+    def new_webview(self, file = None):
         # Returns a WebKit.WebView() with style change handlers registered
         webview = WebKit.WebView()
 
@@ -267,18 +284,24 @@ class LettersWindow(Adw.ApplicationWindow):
         webview.connect("context-menu", self.on_context_menu)
         webview.connect('load-changed', self.load_changed)
 
-        if file_path:
-            webview.file_path = file_path
-            if not file_path.endswith(('.txt', '.html')):
+        if file:
+            webview.file = file
+            if not file.get_path().endswith(('.txt', '.html')):
                 try:
-                    content = pypandoc.convert_file(file_path, 'html', extra_args=['--embed-resources', '--sandbox'])
+                    content = file.load_contents(None)[1]
+                    f = tempfile.NamedTemporaryFile("wb", suffix = file.get_basename())
+                    f.write(content)
+                    content = pypandoc.convert_file(f.name, 'html', extra_args=['--embed-resources', '--sandbox'])
                 except Exception as e:
+                    print(e)
                     content = f"<p>Error loading file: {e}</p>"
             else:
-                with open(file_path, 'r') as f:
-                        content = f.read()
+                content = file.load_contents(None)[1]
+                f = tempfile.NamedTemporaryFile("wb", suffix = file.get_basename())
+                f.write(content)
+                content = f.read()
         else:
-            webview.file_path = ""
+            webview.file = None
             content = '<!DOCTYPE html><html><head></head><body><p></p></body></html>'
 
         webview.load_html(content)
@@ -295,13 +318,13 @@ class LettersWindow(Adw.ApplicationWindow):
             return
         else:
             webview = page.get_child()
-            if webview.file_path: # opened file, edited
-                self.save_out(webview, webview.file_path)
+            if webview.file: # opened file, edited
+                self.save_out(webview)
             else: # new file
                 def save_callback(dialog, result):
                     try:
-                        file = save_dialog.save_finish(result)
-                        self.save_out(webview, file.get_path())
+                        webview.file = save_dialog.save_finish(result)
+                        self.save_out(webview)
                     except Exception as e:
                         self.tabview.close_page_finish(page, False)
 
@@ -322,8 +345,8 @@ class LettersWindow(Adw.ApplicationWindow):
         webview = page.get_child()
         def save_callback(dialog, result):
             try:
-                file = save_dialog.save_finish(result)
-                self.save_out(webview, file.get_path())
+                webview.file = save_dialog.save_finish(result)
+                self.save_out(webview)
             except Exception as e:
                 print(e)
 
@@ -334,27 +357,26 @@ class LettersWindow(Adw.ApplicationWindow):
             save_filter.add_suffix(i)
             filters_list.append(save_filter)
         save_dialog.set_filters(filters_list)
-        if webview.file_path:
-            save_dialog.set_initial_name(os.path.basename(webview.file_path))
+        if webview.file:
+            save_dialog.set_initial_name(webview.file.get_basename())
         else:
             save_dialog.set_initial_name("Untitled Document.odt")
         save_dialog.save(self.get_application().get_active_window(), None, save_callback)
 
-    def save_out(self, webview, file_path):
+    def save_out(self, webview):
         def output_callback(webview, result, data=None):
             page = self.tabview.get_page(webview)
             try:
                 content = webview.evaluate_javascript_finish(result).to_string()
-                ext = file_path.rpartition('.')[2]
+                ext = webview.file.get_path().rpartition('.')[2]
                 if ext not in ['odt', 'docx', 'txt', 'md', 'html']:
                     ext = "odt"
                 try:
-                    pypandoc.convert_text(content, ext, format='html', outputfile=file_path, extra_args=['--embed-resources', '--sandbox'])
+                    pypandoc.convert_text(content, ext, format='html', outputfile=webview.file.get_path(), extra_args=['--embed-resources', '--sandbox'])
 
                     page.set_needs_attention(False)
-                    page.set_title(os.path.basename(file_path))
+                    page.set_title(webview.file.get_basename())
                     self.update_title()
-                    webview.file_path = file_path
                     if page.closing_after_save:
                         self.tabview.close_page_finish(page, True)
                         webview.terminate_web_process()
@@ -379,7 +401,7 @@ class LettersWindow(Adw.ApplicationWindow):
         def save_callback(dialog, result):
             try:
                 file = save_dialog.save_finish(result)
-                self.export_out(webview, file.get_path())
+                self.export_out(webview, file)
             except Exception as e:
                 print(e)
 
@@ -389,13 +411,13 @@ class LettersWindow(Adw.ApplicationWindow):
         save_filter.add_suffix('pdf')
         filters_list.append(save_filter)
         save_dialog.set_filters(filters_list)
-        if webview.file_path:
-            save_dialog.set_initial_name(os.path.basename(webview.file_path))
+        if webview.file:
+            save_dialog.set_initial_name(webview.file.get_basename())
         else:
             save_dialog.set_initial_name("Untitled Document.pdf")
         save_dialog.save(self.get_application().get_active_window(), None, save_callback)
 
-    def export_out(self, webview, file_path):
+    def export_out(self, webview, file):
         def output_callback(webview, result, data=None):
             page = self.tabview.get_page(webview)
             try:
@@ -407,7 +429,7 @@ class LettersWindow(Adw.ApplicationWindow):
                 settings = Gtk.Settings.get_default()
                 font_css = ":root {color-scheme: light dark} body {font-family: \"" + settings.get_property('gtk-font-name').rstrip(' 0123456789') + "\"}"
                 try:
-                    weasyprint.HTML(string=content).write_pdf(file_path, stylesheets=[weasyprint.CSS(string=css), weasyprint.CSS(string=font_css)])
+                    weasyprint.HTML(string=content).write_pdf(file.get_path(), stylesheets=[weasyprint.CSS(string=css), weasyprint.CSS(string=font_css)])
 
                 except Exception as e:
                     print(_("Error exporting file: "), e)

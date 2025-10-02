@@ -35,8 +35,6 @@ class LettersApplication(Adw.Application):
                          flags=Gio.ApplicationFlags.HANDLES_OPEN,
                          resource_base_path='/net/codelogistics/letters')
 
-        print(sys.argv)
-
         self.create_action('quit', self.close_windows, ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
@@ -54,6 +52,9 @@ class LettersApplication(Adw.Application):
         self.create_action("underline", lambda x, y: self.get_active_window().run_js(None, "formatting.underline()"), ["<ctrl>u"])
         self.create_action("insertlink", lambda x, y: self.get_active_window().run_js(None, "formatting.createLink()"), ["<ctrl>k"])
 
+        self.files = []
+        self.connect("open", self.open_files)
+
     def do_activate(self):
         """Called when the application is activated.
 
@@ -62,8 +63,14 @@ class LettersApplication(Adw.Application):
         """
         win = self.props.active_window
         if not win:
-            win = LettersWindow(application=self)
+            if self.files:
+                win = LettersWindow(application=self, opening_with_files = True)
+            else:
+                win = LettersWindow(application=self)
         win.present()
+        if self.files:
+            win.open_files(self.files)
+            del self.files
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""
@@ -98,6 +105,10 @@ class LettersApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
+
+    def open_files(self, application, files, n_files, hint, data = None):
+        self.files = files
+        self.activate()
 
     def close_windows(self, action, data = None):
         for i in self.get_windows():
