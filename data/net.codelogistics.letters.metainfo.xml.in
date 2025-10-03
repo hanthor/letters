@@ -16,6 +16,11 @@
     <name>Satvik Patwardhan</name>
   </developer>
 
+  <categories>
+    <category>Office</category>
+    <category>Utility</category>
+  </categories>
+
   <!-- Required: Should be a link to the upstream homepage for the component -->
   <url type="homepage">https://codeberg.org/eyekay/letters</url>
   <!-- Recommended: It is highly recommended for open-source projects to display the source code repository -->
@@ -50,7 +55,7 @@
   </screenshots>
 
   <releases>
-    <release version="0.1.0" date="2025-10-02">
+    <release version="0.1.0" date="2025-10-03">
       <description translate="no">
         <p>First release</p>
       </description>

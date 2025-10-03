@@ -140,7 +140,7 @@ class LettersWindow(Adw.ApplicationWindow):
         # When window is opened with files
         for i in files:
             webview = self.new_webview(i)
-            webview.file = file
+            webview.file = i
             webview.fresh = False
             page = self.tabview.append(webview)
             page.set_title(i.get_basename())
