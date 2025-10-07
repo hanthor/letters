@@ -327,7 +327,7 @@ class LettersWindow(Adw.ApplicationWindow):
 
                 save_dialog = Gtk.FileDialog()
                 filters_list = Gio.ListStore()
-                for i in ['odt', 'docx', 'txt', 'md', 'html']:
+                for i in ['odt', 'docx', 'rtf', 'txt', 'md', 'html']:
                     save_filter = Gtk.FileFilter()
                     save_filter.add_suffix(i)
                     filters_list.append(save_filter)
@@ -349,7 +349,7 @@ class LettersWindow(Adw.ApplicationWindow):
 
         save_dialog = Gtk.FileDialog()
         filters_list = Gio.ListStore()
-        for i in ['odt', 'docx', 'txt', 'md', 'html']:
+        for i in ['odt', 'docx', 'rtf', 'txt', 'md', 'html']:
             save_filter = Gtk.FileFilter()
             save_filter.add_suffix(i)
             filters_list.append(save_filter)
@@ -366,7 +366,7 @@ class LettersWindow(Adw.ApplicationWindow):
             try:
                 content = webview.evaluate_javascript_finish(result).to_string()
                 ext = webview.file.get_path().rpartition('.')[2]
-                if ext not in ['odt', 'docx', 'txt', 'md', 'html']:
+                if ext not in ['odt', 'docx', 'rtf', 'txt', 'md', 'html']:
                     ext = "odt"
                 try:
                     pypandoc.convert_text(content, ext, format='html', outputfile=webview.file.get_path(), extra_args=['--embed-resources', '--sandbox'])
@@ -409,7 +409,7 @@ class LettersWindow(Adw.ApplicationWindow):
         filters_list.append(save_filter)
         save_dialog.set_filters(filters_list)
         if webview.file:
-            save_dialog.set_initial_name(webview.file.get_basename())
+            save_dialog.set_initial_name(webview.file.get_basename().rpartition('.')[0] + '.pdf')
         else:
             save_dialog.set_initial_name("Untitled Document.pdf")
         save_dialog.save(self.get_application().get_active_window(), None, save_callback)
