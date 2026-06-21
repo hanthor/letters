@@ -62,6 +62,15 @@ class LettersApplication(Adw.Application):
         self.create_action("highlight", lambda x, y: self.get_active_window().run_js(None, "formatting.highlight()"))
         self.create_action("indent", lambda x, y: self.get_active_window().run_js(None, "formatting.indent()"))
         self.create_action("outdent", lambda x, y: self.get_active_window().run_js(None, "formatting.outdent()"))
+
+        # Style actions for narrow toolbar and keyboard shortcuts
+        style_tags = {'style_p': 'p', 'style_h1': 'h1', 'style_h2': 'h2', 'style_h3': 'h3',
+                      'style_h4': 'h4', 'style_h5': 'h5', 'style_h6': 'h6',
+                      'style_code': 'pre', 'style_quote': 'blockquote'}
+        for action_name, tag in style_tags.items():
+            self.create_action(action_name,
+                lambda x, y, t=tag: self.get_active_window().run_js(None, f"applyStyle('{t}')"))
+
         self.create_action("shortcuts", self.on_shortcuts_action)
 
         self.files = []

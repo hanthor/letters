@@ -12,28 +12,55 @@ template $LettersWindow: Adw.ApplicationWindow {
   height-request: 360;
   width-request: 296;
 
+  accessibility {
+    label: _("Letters");
+  }
+
   content: Adw.ToolbarView tbview {
     top-bar-style: raised;
+
+    Adw.Breakpoint {
+      condition: max-width: 500sp;
+      setters:
+        toolbar_extended(visible, false),
+        toolbar_more(visible, true);
+    }
+
     [top]
     Adw.HeaderBar {
+      accessibility {
+        label: _("Header bar");
+      }
+
       [start]
       Button add_button {
+        styles ["flat"];
         icon-name: "list-add";
         tooltip-text: _("New Document");
+        accessibility {
+          label: _("New Document");
+        }
       }
 
       [end]
       MenuButton {
+        styles ["flat"];
         primary: true;
         icon-name: "open-menu-symbolic";
         tooltip-text: _("Main Menu");
         menu-model: primary_menu;
+        accessibility {
+          label: _("Main Menu");
+        }
       }
     }
 
     [top]
     Adw.TabBar tabbar {
       view: tabview;
+      accessibility {
+        label: _("Document tabs");
+      }
     }
 
     [top]
@@ -44,41 +71,79 @@ template $LettersWindow: Adw.ApplicationWindow {
         ToggleButton bold_button {
           icon-name: "text-bold-symbolic";
           tooltip-text: _("Bold");
+          accessibility {
+            label: _("Bold");
+          }
         }
 
         ToggleButton italic_button {
           icon-name: "text-italic-symbolic";
           tooltip-text: _("Italic");
+          accessibility {
+            label: _("Italic");
+          }
         }
 
         ToggleButton underline_button {
           icon-name: "text-underline-symbolic";
           tooltip-text: _("Underline");
+          accessibility {
+            label: _("Underline");
+          }
         }
 
-        MenuButton {
-          tooltip-text: _("Formatting Options");
-          menu-model: formatting_menu;
+        Box toolbar_extended {
+          orientation: horizontal;
+          spacing: 6;
+
+          MenuButton {
+            tooltip-text: _("Formatting Options");
+            menu-model: formatting_menu;
+            direction: down;
+            accessibility {
+              label: _("Formatting Options");
+            }
+          }
+
+          MenuButton {
+            icon-name: "list-add-symbolic";
+            tooltip-text: _("Insert...");
+            menu-model: insert_menu;
+            direction: down;
+            accessibility {
+              label: _("Insert");
+            }
+          }
+
+          DropDown styles_dropdown{
+            tooltip-text: _("Paragraph Style");
+            model: styles_list;
+            accessibility {
+              label: _("Paragraph Style");
+            }
+          }
+        }
+
+        MenuButton toolbar_more {
+          visible: false;
+          icon-name: "view-more-symbolic";
+          tooltip-text: _("More");
+          menu-model: more_menu;
           direction: down;
-        }
-
-        MenuButton {
-          icon-name: "list-add-symbolic";
-          tooltip-text: _("Insert...");
-          menu-model: insert_menu;
-          direction: down;
-        }
-
-        DropDown styles_dropdown{
-          tooltip-text: _("Paragraph Style");
-          model: styles_list;
+          accessibility {
+            label: _("More formatting options");
+          }
         }
       }
 
     content: Stack stack {
       [child]
       StackPage {
-        child: Adw.TabView tabview {};
+        child: Adw.TabView tabview {
+          accessibility {
+            label: _("Document editor");
+          }
+        };
       }
 
       [child]
@@ -87,6 +152,9 @@ template $LettersWindow: Adw.ApplicationWindow {
           icon-name: "document-new-symbolic";
           title: _("Create a new document");
           description: _("Create a new document (Ctrl + N), or open an existing one (Ctrl + O)");
+          accessibility {
+            label: _("Empty state");
+          }
         };
       }
     };
@@ -169,4 +237,29 @@ menu formatting_menu{
       label: _("Decrease Indent");
       action: "app.outdent";
     }
+}
+
+menu more_menu {
+  section {
+    item { label: _("Paragraph"); action: "app.style_p"; }
+    item { label: _("Heading 1"); action: "app.style_h1"; }
+    item { label: _("Heading 2"); action: "app.style_h2"; }
+    item { label: _("Heading 3"); action: "app.style_h3"; }
+    item { label: _("Heading 4"); action: "app.style_h4"; }
+    item { label: _("Heading 5"); action: "app.style_h5"; }
+    item { label: _("Heading 6"); action: "app.style_h6"; }
+    item { label: _("Code"); action: "app.style_code"; }
+    item { label: _("Quote"); action: "app.style_quote"; }
+  }
+  section {
+    item { label: _("Strikethrough"); action: "app.strikethrough"; }
+    item { label: _("Highlight"); action: "app.highlight"; }
+    item { label: _("Increase Indent"); action: "app.indent"; }
+    item { label: _("Decrease Indent"); action: "app.outdent"; }
+  }
+  section {
+    item { label: _("Insert Image"); action: "app.insertimage"; }
+    item { label: _("Insert Link"); action: "app.insertlink"; }
+    item { label: _("Insert List"); action: "app.insertlist"; }
+  }
 }
