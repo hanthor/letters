@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Letters
 Exec=letters %u
-Icon=io.github.hanthor.letters
+Icon=org.tunaos.letters
 Terminal=false
 Type=Application
 Categories=Office;WordProcessor;

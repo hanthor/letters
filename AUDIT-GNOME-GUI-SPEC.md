@@ -3,7 +3,7 @@
 **Spec source**: https://github.com/hanthor/gnome-gui-spec
 **Framework**: Python + PyGObject + GTK 4 + libadwaita + WebKitGTK 6.0
 **UI Format**: Blueprint (.blp) compiled to GtkBuilder XML
-**App ID**: io.github.hanthor.letters
+**App ID**: org.tunaos.letters
 **Audit date**: 2026-06-21
 **Auditor**: gnome-gui-spec v0.2.0
 
