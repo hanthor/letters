@@ -406,7 +406,7 @@ class TestRegressions:
             content = f.read()
         # print() still exists for debug but should be paired with user feedback
         assert "show_error" in content
-        assert "show_toast" in content
+        assert "toast" in content  # now inherited from SuiteWindow
 
     def test_shortcuts_action_registered(self):
         """app.shortcuts action must be registered (C2 regression check).
