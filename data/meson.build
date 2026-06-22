@@ -1,6 +1,6 @@
 desktop_file = i18n.merge_file(
-        input: 'net.codelogistics.letters.desktop.in',
-       output: 'net.codelogistics.letters.desktop',
+        input: 'org.tunaos.letters.desktop.in',
+       output: 'org.tunaos.letters.desktop',
          type: 'desktop',
        po_dir: '../po',
       install: true,
@@ -13,8 +13,8 @@ if desktop_utils.found()
 endif
 
 appstream_file = i18n.merge_file(
-        input: 'net.codelogistics.letters.metainfo.xml.in',
-       output: 'net.codelogistics.letters.metainfo.xml',
+        input: 'org.tunaos.letters.metainfo.xml.in',
+       output: 'org.tunaos.letters.metainfo.xml',
        po_dir: '../po',
       install: true,
   install_dir: get_option('datadir') / 'metainfo'
@@ -24,7 +24,7 @@ appstreamcli = find_program('appstreamcli', required: false, disabler: true)
 test('Validate appstream file', appstreamcli,
      args: ['validate', '--no-net', '--explain', appstream_file])
 
-install_data('net.codelogistics.letters.gschema.xml',
+install_data('org.tunaos.letters.gschema.xml',
   install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'
 )
 
@@ -37,8 +37,8 @@ test('Validate schema file',
 service_conf = configuration_data()
 service_conf.set('bindir', get_option('prefix') / get_option('bindir'))
 configure_file(
-  input: 'net.codelogistics.letters.service.in',
-  output: 'net.codelogistics.letters.service',
+  input: 'org.tunaos.letters.service.in',
+  output: 'org.tunaos.letters.service',
   configuration: service_conf,
   install_dir: get_option('datadir') / 'dbus-1' / 'services'
 )
