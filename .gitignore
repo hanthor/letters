@@ -1,1 +1,6 @@
 /subprojects/blueprint-compiler
+
+/subprojects/suite-common/
+/.flatpak-builder/
+/build*/
+/repo/

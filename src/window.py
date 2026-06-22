@@ -291,7 +291,9 @@ class LettersWindow(Adw.ApplicationWindow):
         # Apply spellcheck setting
         if self._settings:
             spellcheck = self._settings.get_boolean("spell-check-enabled")
-            webview.get_settings().set_enable_spell_checking(spellcheck)
+            _ws = webview.get_settings()
+            if hasattr(_ws, "set_enable_spell_checking"):
+                _ws.set_enable_spell_checking(spellcheck)
 
         ucm = webview.get_user_content_manager()
         ucm.register_script_message_handler("styleChange")
