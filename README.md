@@ -12,11 +12,11 @@ It can also export your documents to PDF using [weasyprint](https://weasyprint.o
 
 > **This is a hard fork** of [Letters by Satvik Patwardhan](https://codeberg.org/eyekay/letters),
 > maintained as part of the [TunaOS](https://github.com/tuna-os) GNOME office suite alongside
-> [Tables](https://github.com/hanthor/tables) and [Decks](https://github.com/hanthor/decks).
+> [Tables](https://github.com/tuna-os/tables) and [Decks](https://github.com/tuna-os/decks).
 > All credit for the original Letters architecture, design, and implementation goes to
 > **Satvik Patwardhan** and contributors.
 > 
-> This fork extends the original by adopting the [suite-common](https://github.com/hanthor/suite-common)
+> This fork extends the original by adopting the [suite-common](https://github.com/tuna-os/suite-common)
 > shared scaffold, adding keyboard shortcuts, formatting toolbar extensions, find/replace, word count,
 > table insertion, and comprehensive test infrastructure.
 
@@ -34,7 +34,7 @@ flatpak install tuna-os org.tunaos.letters
 ## Building
 
 ```bash
-git clone https://github.com/hanthor/letters.git
+git clone https://github.com/tuna-os/letters.git
 cd letters
 just setup   # clones suite-common subproject
 just build   # builds & installs Flatpak
