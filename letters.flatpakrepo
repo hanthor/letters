@@ -1,0 +1,6 @@
+[Flatpak Repo]
+Title=TunaOS Flatpaks — Letters
+Url=oci+https://hanthor.github.io/letters
+Homepage=https://github.com/hanthor/letters
+Comment=TunaOS Flatpak repository for Letters
+Description=Word processor for GNOME
