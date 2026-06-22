@@ -54,3 +54,10 @@ letters_sources = [
 ]
 
 install_data(letters_sources, install_dir: moduledir)
+
+# --- suite migration: consume suite-common as a meson subproject ---
+suite_common = subproject('suite-common')
+install_data(
+  suite_common.get_variable('suite_common_sources'),
+  install_dir: pkgdatadir / 'suite_common',
+)
