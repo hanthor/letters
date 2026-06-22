@@ -414,7 +414,7 @@ class TestRegressions:
         Now provided by SuiteApplication, which all apps inherit."""
         import os
         base = os.path.dirname(os.path.abspath(__file__))
-        suite_common = os.path.join(base, '..', '..', '..', 'suite-common',
+        suite_common = os.path.join(base, '..', '..', 'suite-common',
                                      'suite_common', 'application.py')
         if os.path.exists(suite_common):
             with open(suite_common) as f:
