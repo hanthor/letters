@@ -12,7 +12,7 @@ pub struct LettersWindow {
 
 impl LettersWindow {
     pub fn new(app: &libadwaita::Application) -> Self {
-        let win = libadwaita::ApplicationWindow::new(Some("org.tunaos.letters"), Default::default());
+        let win = libadwaita::ApplicationWindow::new(app);
         win.set_title(Some("Letters"));
         win.set_default_size(800, 600);
 
