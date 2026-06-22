@@ -1,43 +1,35 @@
-// window.rs — Letters main window: GtkSourceView editor.
+// window.rs — Letters main window: native GTK4 text editor.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use gtk4 as gtk;
 use gtk::prelude::*;
 use libadwaita::prelude::AdwApplicationWindowExt;
-use sourceview5 as sv;
 
 pub struct LettersWindow {
     window: libadwaita::ApplicationWindow,
-    editor: sv::View,
+    editor: gtk::TextView,
 }
 
 impl LettersWindow {
     pub fn new(app: &libadwaita::Application) -> Self {
-        let win = libadwaita::ApplicationWindow::new(app);
+        let win = libadwaita::ApplicationWindow::new(Some("org.tunaos.letters"), Default::default());
         win.set_title(Some("Letters"));
         win.set_default_size(800, 600);
 
-        // Header bar
         let header = libadwaita::HeaderBar::new();
         let open_btn = gtk::Button::with_label("Open");
         header.pack_start(&open_btn);
         let save_btn = gtk::Button::with_label("Save");
         header.pack_start(&save_btn);
 
-        // Toolbar
         let toolbar = gtk::Box::new(gtk::Orientation::Horizontal, 4);
         toolbar.set_halign(gtk::Align::Center);
         toolbar.add_css_class("toolbar");
-        let bold_btn = gtk::ToggleButton::with_label("B");
-        let italic_btn = gtk::ToggleButton::with_label("I");
-        let underline_btn = gtk::ToggleButton::with_label("U");
-        toolbar.append(&bold_btn);
-        toolbar.append(&italic_btn);
-        toolbar.append(&underline_btn);
+        toolbar.append(&gtk::ToggleButton::with_label("B"));
+        toolbar.append(&gtk::ToggleButton::with_label("I"));
+        toolbar.append(&gtk::ToggleButton::with_label("U"));
 
-        // Editor (GtkSourceView)
-        let buffer = sv::Buffer::new(None);
-        let editor = sv::View::with_buffer(&buffer);
+        let editor = gtk::TextView::new();
         editor.set_monospace(true);
         editor.set_wrap_mode(gtk::WrapMode::Word);
         let scroll = gtk::ScrolledWindow::new();
@@ -48,15 +40,14 @@ impl LettersWindow {
         main_box.append(&toolbar);
         main_box.append(&scroll);
 
+        let status = gtk::Label::new(Some("0 words"));
+        status.set_halign(gtk::Align::End);
+        main_box.append(&status);
+
         let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
         container.append(&header);
         container.append(&main_box);
         win.set_content(Some(&container));
-
-        // Word count label
-        let status = gtk::Label::new(Some("0 words"));
-        status.set_halign(gtk::Align::End);
-        main_box.append(&status);
 
         Self { window: win, editor }
     }

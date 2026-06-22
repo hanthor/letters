@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 gtk4 = { version = "0.9", package = "gtk4" }
 libadwaita = "0.7"
-sourceview5 = "0.9"
 
 [[bin]]
 name = "letters"
