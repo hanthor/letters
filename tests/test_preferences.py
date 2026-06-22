@@ -409,7 +409,18 @@ class TestRegressions:
         assert "show_toast" in content
 
     def test_shortcuts_action_registered(self):
-        """app.shortcuts action must be registered (C2 regression check)."""
-        with open("src/main.py") as f:
-            content = f.read()
-        assert '"shortcuts"' in content or "'shortcuts'" in content
+        """app.shortcuts action must be registered (C2 regression check).
+
+        Now provided by SuiteApplication, which all apps inherit."""
+        import os
+        base = os.path.dirname(os.path.abspath(__file__))
+        suite_common = os.path.join(base, '..', '..', '..', 'suite-common',
+                                     'suite_common', 'application.py')
+        if os.path.exists(suite_common):
+            with open(suite_common) as f:
+                content = f.read()
+            assert '"shortcuts"' in content or "'shortcuts'" in content
+        else:
+            with open("src/main.py") as f:
+                content = f.read()
+            assert '"shortcuts"' in content or "'shortcuts'" in content
