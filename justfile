@@ -1,7 +1,7 @@
 # Letters — build & run as a Flatpak using org.flatpak.Builder (himachal pipeline).
 # Part of the suite migration: consumes suite-common as a meson subproject.
 
-app_id := "net.codelogistics.letters"
+app_id := "org.tunaos.letters"
 manifest := app_id + ".json"
 
 default:
