@@ -4,3 +4,6 @@
 /.flatpak-builder/
 /build*/
 /repo/
+
+# Local screenshots are not project assets.
+/screenshot.png
