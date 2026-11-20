@@ -65,7 +65,7 @@ jobs:
           npx c8 --reporter=text --reporter=lcov node tests/test_md_patterns.js 2>&1 || true
 
       - name: Upload JS coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-js
@@ -92,7 +92,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Python coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-python
