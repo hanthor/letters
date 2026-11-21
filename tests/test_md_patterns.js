@@ -392,6 +392,23 @@ if (stack.length > 0) {
 assert.equal(redoStack.length, 0);
 console.log('✓ Redo stack cleared on new action');
 
+// ============================== SOURCE SYNC ==============================
+
+console.log('\n=== Patterns match src/editor.js ===\n');
+
+const fs = require('fs');
+const path = require('path');
+const editorSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'editor.js'), 'utf8');
+
+// The inline patterns above are copies; fail if editor.js changes them.
+const srcInline = [...editorSrc.matchAll(/\{ regex: \/(.+)\/g,\s+(?:handler|tag):/g)]
+  .map(m => m[1]);
+assert.deepEqual(srcInline, inlinePatterns.map(p => p.regex.source.replace(/\\\//g, '/')));
+console.log(`✓ ${srcInline.length} inline patterns identical to src/editor.js`);
+
+assert.ok(editorSrc.includes('text.match(/^(#{1,6})\\s+(.+)/)'));
+console.log('✓ heading pattern identical to src/editor.js');
+
 // ============================== SUMMARY ==============================
 
 console.log(`\n✓ All ${assert.strict ? 'assertions' : 'tests'} passed!`);
