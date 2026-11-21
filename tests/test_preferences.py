@@ -421,6 +421,8 @@ class TestRegressions:
                 content = f.read()
             assert '"shortcuts"' in content or "'shortcuts'" in content
         else:
-            with open("src/main.py") as f:
+            # Without a suite-common checkout beside this repo (CI), the
+            # most we can check is that main.py still inherits the action.
+            with open(os.path.join(base, '..', 'src', 'main.py')) as f:
                 content = f.read()
-            assert '"shortcuts"' in content or "'shortcuts'" in content
+            assert 'class LettersApplication(SuiteApplication)' in content
