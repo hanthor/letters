@@ -43,6 +43,15 @@ flatpak install tuna-os org.tunaos.letters
 
 ## Building
 
+Requires [`just`](https://just.systems), [Flatpak](https://flatpak.org/setup/) and the
+[Flatpak Builder](https://flathub.org/apps/org.flatpak.Builder) app from Flathub:
+
+```bash
+flatpak install flathub org.flatpak.Builder
+```
+
+Then:
+
 ```bash
 git clone https://github.com/hanthor/letters.git
 cd letters
@@ -54,8 +63,10 @@ just run     # launches the app
 ## Test
 
 ```bash
-just lint         # syntax check
-pytest tests/     # 81 unit tests
+just lint                        # syntax check
+pip install pytest               # once
+pytest tests/                    # Python unit tests
+node tests/test_md_patterns.js   # JavaScript Markdown pattern tests
 ```
 
 ## License
